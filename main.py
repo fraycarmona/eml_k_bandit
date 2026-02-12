@@ -18,8 +18,8 @@ from typing import List
 
 import numpy as np
 
-from algorithms import Algorithm, EpsilonGreedy
-from arms import ArmNormal, Bandit
+from algorithms import Algorithm, EpsilonGreedy, Softmax
+from arms import ArmNormal, ArmBernoulli, ArmBinomial, Bandit
 from plotting import plot_average_rewards, plot_optimal_selections
 
 
@@ -92,14 +92,20 @@ def main():
     steps = 1000  # Número de pasos
     runs = 500  # Número de ejecuciones
 
-    bandit = Bandit(arms=ArmNormal.generate_arms(k))  # Bandit(arms=ArmBinomial.generate_arms(k))
-    # bandit = Bandit(arms=ArmBernoulli.generate_arms(k))  # Bandit(arms=ArmBinomial.generate_arms(k))
+    bandit = Bandit(arms=ArmNormal.generate_arms(k))
+    # bandit = Bandit(arms=ArmBernoulli.generate_arms(k))
+    # bandit = Bandit(arms=ArmBinomial.generate_arms(k, n_min=1, n_max=5))
     print(bandit)
 
     optimal_arm: int = bandit.optimal_arm
     print(f"Optimal arm: {optimal_arm + 1} with expected reward={bandit.get_expected_value(optimal_arm)}")
 
-    algorithms = [EpsilonGreedy(k=k, epsilon=0), EpsilonGreedy(k=k, epsilon=0.01), EpsilonGreedy(k=k, epsilon=0.1)]
+    algorithms = [
+        EpsilonGreedy(k=k, epsilon=0),
+        EpsilonGreedy(k=k, epsilon=0.01),
+        EpsilonGreedy(k=k, epsilon=0.1),
+        Softmax(k=k, temperature=0.5),
+    ]
 
     # Ejecutar el experimento y obtener las recompensas promedio y selecciones óptimas
     rewards, optimal_selections = run_experiment(bandit, algorithms, steps, runs)
@@ -107,7 +113,7 @@ def main():
     # Generar las gráficas utilizando las funciones externas
     plot_average_rewards(steps, rewards, algorithms)
 
-    # plot_optimal_selections(steps, optimal_selections, algorithms)
+    plot_optimal_selections(steps, optimal_selections, algorithms)
 
 
 
