@@ -18,7 +18,7 @@ import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from algorithms import Algorithm, EpsilonGreedy
+from algorithms import Algorithm
 
 
 def get_algorithm_label(algo: Algorithm) -> str:
@@ -30,14 +30,21 @@ def get_algorithm_label(algo: Algorithm) -> str:
     :return: Cadena descriptiva para el algoritmo.
     :rtype: str
     """
-    label = type(algo).__name__
-    if isinstance(algo, EpsilonGreedy):
-        label += f" (epsilon={algo.epsilon})"
-    # elif isinstance(algo, OtroAlgoritmo):
-    #     label += f" (parametro={algo.parametro})"
-    # Añadir más condiciones para otros algoritmos aquí
-    else:
+    if not isinstance(algo, Algorithm):
         raise ValueError("El algoritmo debe ser de la clase Algorithm o una subclase.")
+
+    label = type(algo).__name__
+
+    # Añadimos parámetros comunes cuando existen en el algoritmo.
+    params = []
+    if hasattr(algo, "epsilon"):
+        params.append(f"epsilon={algo.epsilon}")
+    if hasattr(algo, "temperature"):
+        params.append(f"temperature={algo.temperature}")
+
+    if params:
+        label += f" ({', '.join(params)})"
+
     return label
 
 
@@ -72,6 +79,16 @@ def plot_optimal_selections(steps: int, optimal_selections: np.ndarray, algorith
     :param optimal_selections: Matriz de porcentaje de selecciones óptimas.
     :param algorithms: Lista de instancias de algoritmos comparados.
     """
+    sns.set_theme(style="whitegrid", palette="muted", font_scale=1.2)
 
-    raise NotImplementedError("Esta función aún no ha sido implementada.")
+    plt.figure(figsize=(14, 7))
+    for idx, algo in enumerate(algorithms):
+        label = get_algorithm_label(algo)
+        plt.plot(range(steps), optimal_selections[idx], label=label, linewidth=2)
 
+    plt.xlabel('Pasos de Tiempo', fontsize=14)
+    plt.ylabel('% Selección brazo óptimo', fontsize=14)
+    plt.title('Porcentaje de selección del brazo óptimo vs Pasos de Tiempo', fontsize=16)
+    plt.legend(title='Algoritmos')
+    plt.tight_layout()
+    plt.show()
