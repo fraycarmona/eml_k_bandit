@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from algorithms import Algorithm
 
 
-def get_algorithm_label(algo: Algorithm) -> str:
+def algorithm_label(algo: Algorithm) -> str:
     """
     Genera una etiqueta descriptiva para el algoritmo incluyendo sus parámetros.
 
